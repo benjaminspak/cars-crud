@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- #region Sabio Code - You can Fold this region to remove it from sight -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Sabio Coding Bootcamp" />
+  <meta itemprop="image" content="https://sabio.la/Sabio.png">
+  <link rel="shortcut icon" href="https://sabio.la/Sabio.png">
+  <link rel="icon" type="image/png" href="https://sabio.la/Sabio.png" />
+  <!-- Do Not Change the HTML title or anything between this line and the line with the 💘's -->
+  <title>PW Execise Template</title>
+  <link href="http://pw.sabio.la/dist/all-site.css" rel="stylesheet" />
+  <script src="http://pw.sabio.la/api/js/site"></script>
+  <script src="service.js"></script>
+
+  <!-- #endregion -->
+  <!-- I 💘 Code, You 💘 Code, We all 💘 Code -->
+
+  <!-- 💡 All your CSS in here -->
+  <style>
+    #formContainer {
+      margin-top: 1em;
+      margin-bottom: 2em;
+      border: 1.5px solid rgba(0, 0, 0, .125);
+      border-radius: .25rem;
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+      max-width: 600px;
+    }
+
+    .buttonContainer {
+      margin-top: .75em;
+      margin-bottom: .75em;
+    }
+
+    #titleContainer {
+      margin-top: 3em;
+      margin-bottom: 2em;
+    }
+
+    .inputFormLabel {
+      font-size: 1.25rem;
+    }
+
+    .cardContainer {
+      margin-top: 1em;
+      margin-bottom: 2em;
+    }
+
+    #cardContainer {}
+  </style>
+</head>
+
+<body class="sabio" data-ins="pw-00">
+  <!-- Do Not Edit or Remove this nav element -->
+  <nav class="do-not-remove navbar navbar-expand-md navbar-dark bg-dark sabio"></nav>
+
+  <div class="container" id="getCarsContainer">
+    <form>
+      <div class="row justify-content-center">
+        <button type="submit" class="btn btn-primary mb-2" id="getAllCars">View all cars</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="container" id="titleContainer">
+    <div class="row justify-content-center">
+      <h1>Add a Car</h1>
+    </div>
+  </div>
+
+  <div class="container" id="formContainer">
+
+    <form id="submissionForm">
+
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <div class="form-group">
+            <label for="carYear" class="inputFormLabel">Year</label>
+            <input type="text" class="form-control" id="carYear" name="carYear" placeholder="What is your car make?"
+              required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <div class="form-group">
+            <label for="carMake" class="inputFormLabel">Make</label>
+            <input type="text" class="form-control" id="carMake" name="carMake" placeholder="What is your car make?"
+              required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <div class="form-group">
+            <label for="carModel" class="inputFormLabel">Model</label>
+            <input type="text" class="form-control" id="carModel" name="carModel" placeholder="What model is your car?"
+              required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center buttonContainer">
+        <div class="col-6">
+          <button class="btn btn-primary" type="submit" id="addACar">Add car</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+  <div class="container" id="cardContainer">
+
+  </div>
+
+  <!-- Do Not Edit or Remove this footer element -->
+  <footer class="do-not-remove container-fluid footer mx-auto  fb-targert sabio">
+    <p class="text-center">© Sabio.la 2019</p>
+  </footer>
+
+  <!--👇🏻 All your JavaScript code goes below here inside this script tag 👇🏻 -->
+  <script type="text/html" id="cardTemplate">
+    <div class="row justify-content-center item">
+      <div class="col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Special title treatment</h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <button class="btn btn-primary updateCar" type="submit">Update</button>
+            <button class="btn btn-primary deleteCar" type="submit">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script id="candidateCode">
+
+    function startUp() {
+      console.log("startUp");
+      // load form
+      $("#getAllCars").on("click", getAllCars);
+      $("#addACar").on("click", addACar);
+    }
+
+    let getAllCars = e => {
+      e.preventDefault();
+      console.log("getAllCars");
+      $("#cardContainer").html("");
+      services.cars.getAll()
+        .then(onGetSuccess)
+        .fail(onGetError);
+    }
+
+    let addACar = e => {
+      e.preventDefault();
+      console.log("addACar");
+      let payload = getFormData();
+      services.cars.add(payload)
+        .then(onCarAddSuccess)
+        .fail(onCarAddError);
+    }
+
+    let updateACar = (data) => {
+      console.log("Entered Update Car Function")
+
+      let findId = "#" + data.id;
+
+      $(findId).attr("data-year", data.carYear);
+      $(findId).attr("data-make", data.carMake);
+      $(findId).attr("data-model", data.carModel);
+
+      $(findId).find(".card-title").text(data.carYear + " " + data.carMake + " " + data.carModel);
+
+      services.cars.update(data)
+        .then(onCarUpdateSuccess)
+        .fail(onCarUpdateError);
+    }
+
+    let getCarInfo = (e, cardID) => {
+      console.log("Update CLicked")
+      e.preventDefault();
+      let selectCard = $(e.target).closest(".item");
+
+      // Grab item data
+      let getID = selectCard.attr("id");
+      let getYear = selectCard.attr("data-year");
+      let getMake = selectCard.attr("data-make");
+      let getModel = selectCard.attr("data-model");
+
+      // Change Add Car button text to Update Car
+      $("#addACar").text("Update Car");
+
+      // Populate form with data
+      $("#carYear").val(getYear);
+      $("#carMake").val(getMake);
+      $("#carModel").val(getModel);
+
+      // Change event listener on Update Car button
+      $("#addACar").off();
+      $(".buttonContainer").find("#addACar").attr("id", "updateACar");
+      console.log("Event Changed");
+
+      $("#updateACar").on("click", { getID }, getNewFormData);
+    }
+
+    let deleteACar = (e) => {
+      console.log("Delete CLicked")
+      e.preventDefault();
+      let selectCard = $(e.target).closest(".item");
+      console.log(selectCard);
+      let getID = selectCard.attr("id");
+
+      services.cars.delete(getID)
+        .then(onCarDeleteSuccess.bind(null, getID))
+        .fail(onCarDeleteError);
+    }
+
+    // HELPER FUNCTIONS
+
+    let getNewFormData = e => {
+      e.preventDefault();
+
+      console.log("Update Car Clicked");
+      let carId = parseInt(e.data.getID);
+      let carYear = $("#carYear").val();
+      let carMake = $("#carMake").val();
+      let carModel = $("#carModel").val();
+
+      let updateCarObj = {
+        id: carId
+        , carYear: carYear
+        , carMake: carMake
+        , carModel: carModel
+      }
+
+      updateACar(updateCarObj);
+    }
+
+    let loadTemplate = data => {
+      var template = $($("#cardTemplate").html());
+      return template;
+    }
+
+    let writeAllToTemplate = data => {
+      let cardTemplate = loadTemplate();
+
+      // console.log(data.id)
+
+      if (data.carYear == undefined || data.carMake == undefined || data.carModel == undefined) {
+        return;
+      }
+
+      cardTemplate.attr("id", data.id);
+      cardTemplate.attr("data-year", data.carYear);
+      cardTemplate.attr("data-make", data.carMake);
+      cardTemplate.attr("data-model", data.carModel);
+      cardTemplate.find(".card-title").text(data.carYear + " " + data.carMake + " " + data.carModel);
+      cardTemplate.find(".card-text").text("Some car details");
+      cardTemplate.find(".updateCar").on("click", getCarInfo);
+      cardTemplate.find(".deleteCar").on("click", deleteACar);
+      $("#cardContainer").append(cardTemplate);
+    }
+
+    let carLoop = data => {
+      for (var i = 0; i < data.length; i++) {
+        writeAllToTemplate(data[i]);
+      }
+    }
+
+    let getFormData = () => {
+
+      return {
+        carYear: $("#carYear").val()
+        , carMake: $("#carMake").val()
+        , carModel: $("#carModel").val()
+      }
+    }
+
+    let addCarToTemplate = (data, formData) => {
+      let cardTemplate = loadTemplate();
+      console.log(data);
+      cardTemplate.attr("id", data);
+      cardTemplate.attr("data-year", formData.carYear);
+      cardTemplate.attr("data-make", formData.carMake);
+      cardTemplate.attr("data-model", formData.carModel);
+      cardTemplate.find(".card-title").text(formData.carYear + " " + formData.carMake + " " + formData.carModel);
+      cardTemplate.find(".card-text").text("Some car details");
+      cardTemplate.find(".updateCar").on("click", getCarInfo);
+      cardTemplate.find(".deleteCar").on("click", deleteACar);
+
+      $("#cardContainer").append(cardTemplate);
+    }
+
+    // SEE 'service.js' for AJAX calls.
+
+    // SUCCESS & ERROR HANDLERS
+
+    let onGetSuccess = data => {
+      console.log("onGetSuccess", data);
+      carLoop(data.items);
+    }
+
+    let onGetError = err => {
+      console.log(err);
+    }
+
+    let onCarAddSuccess = data => {
+      let payload = getFormData();
+      let itemID = data.item;
+      console.log("Item ID:" + " " + itemID);
+      console.log(payload);
+      addCarToTemplate(itemID, payload);
+    }
+
+    let onCarAddError = err => {
+      console.log("onCarAddError", data);
+      console.log(err);
+    }
+
+    let = onCarUpdateSuccess = (promiseData, data) => {
+      console.log("Car Updated")
+
+      // Clear Form
+      $("#carYear").val("");
+      $("#carMake").val("");
+      $("#carModel").val("");
+
+      // On success change "Update Car" back to "Add Car"
+      $("#updateACar").off();
+      $("#updateACar").text("Add Car");
+      $("#addACar").on("click", addACar);
+    }
+
+    let = onCarUpdateError = (err) => {
+      console.log("Unable to update car");
+    }
+
+    let = onCarDeleteSuccess = (promiseData, data) => {
+      console.log("Car was deleted");
+      console.log(data);
+      console.log(promiseData);
+      $("#" + promiseData).remove();
+      // Add confirmation message prior to allowing delete
+    }
+
+    let = onCarDeleteError = (err) => {
+      console.log("Unable to delete car")
+    }
+
+
+  </script>
+  <!-- 🛑 Do Not Write Any Code Below here -->
+</body>
+
+</html>
